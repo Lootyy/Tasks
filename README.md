@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Build folder already contains a built app to be server with a https server
+
 ## Available Scripts
 
 In the project directory, you can run:
