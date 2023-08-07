@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+# Tasks
+
+A task area with native html5 drag & drop cards, and custom draggable lists. WIP
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
