@@ -2,6 +2,9 @@
 
 A task area with native html5 drag & drop cards, and custom draggable lists. WIP
 
+<img src='https://github.com/Lootyy/Tasks/assets/42943588/7d3ffe43-5be8-4d99-8aff-c354d1c2c472'  width='70%'>
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 Build folder already contains a built app to be server with a https server
