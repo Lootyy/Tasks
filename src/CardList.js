@@ -7,6 +7,8 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
     const [isDragging, setDragging] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
 
+    //todo track when card is dragged over
+
     useEffect(() => {
         function closeMenu() {
             setMenuOpen(false)
@@ -107,9 +109,9 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
             {
                 menuOpen && 
                 <ul className='Dropdown__options'>
-                    <li onClick={handleInsertList}>Insert before</li>
-                    <li onClick={handleAddList}>Insert after</li>
-                    <li onClick={handleRemoveList}>Remove list</li>
+                    <li className='Dropdown__option' onClick={handleInsertList}>Insert before</li>
+                    <li className='Dropdown__option' onClick={handleAddList}>Insert after</li>
+                    <li className='Dropdown__option' onClick={handleRemoveList}>Remove list</li>
                 </ul>
             }
         </div>

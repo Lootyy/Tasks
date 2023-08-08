@@ -10,6 +10,10 @@
                             'nav cards feed'
                             'nav cards feed';
     height: 100vh;
+
+    --type-1: #ff7575;
+    --type-2: #63ff85;
+    --type-3: #4dd6f8;
 }
 
 .HamburgerMenu {
@@ -70,7 +74,6 @@ body {
 }
 
 .Dropdown {
-    position: relative; 
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -85,10 +88,17 @@ body {
     transform: rotate(-90deg) rotateY(180deg);
 }
 
+.Dropdown__content {    
+    position: relative; 
+}
+
 .Dropdown__preview {
     border-radius: .3rem;
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: .5rem;
+    padding: .5rem;
 }
 
 .Dropdown__indicator {
@@ -104,14 +114,18 @@ body {
 .Dropdown__options {
     background: #fff;
     list-style: none;
-    padding: .5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: .5rem;
     margin: 0;
+    padding: .5rem;
     position: absolute;
     width: 100%;
     border-radius: .3rem;
     box-shadow: 0 0 1rem #bbb;
     bottom: 0;
-    transform: translate(-.5rem, calc(100% + 1rem));
+    transform: translate(0, calc(100% + 1rem));
     z-index: 2;
 }
 
@@ -122,12 +136,13 @@ body {
     top: 2rem;
 }
 
-.Dropdown__options li {
-    padding: .5rem;
+.Dropdown__option {
     border-radius: .2rem;
+    padding: .5rem;
+    display: flex;
 }
 
-.Dropdown__options li:hover {
+.Dropdown__option:hover {
     background: #ccc;
 }
 
@@ -228,6 +243,7 @@ body {
 .CardList.Horizontal .Card_wrapper {
     flex-direction: row;
     gap: 2rem;
+    max-height: 14rem;
 }
 
 .Card_wrapper[data-isdragging=true]
@@ -292,6 +308,7 @@ body {
     flex-grow: 1;
     min-height: 0;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .Card__Content_Text {
@@ -300,8 +317,11 @@ body {
     background: #eee;
     white-space: pre-line;
     border-radius: .5rem;
-    overflow: hidden;
     height: 100%;
+}
+
+.Card__Content_TaskList {
+    margin: 0;
 }
 
 .Card__Content_TaskList [data-checked=true] {
@@ -315,20 +335,22 @@ body {
 }
 
 [data-tasktype='Type 1'] .Card__Header__Type {
-    background: #ff7575;
+    background: var(--type-1);
 }
 
 [data-tasktype='Type 2'] .Card__Header__Type {
-    background: #63ff85;
+    background: var(--type-2);
 }
 
 [data-tasktype='Type 3'] .Card__Header__Type {
-    background: #4dd6f8;
+    background: var(--type-3);
 }
 
 .Card__Footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
+    gap: .5rem;
 }
 
 .Card__Footer__Assignee {
@@ -344,6 +366,7 @@ body {
     height: 1.5rem;
     display: grid;
     place-items: center;
+    margin-left: auto;
 }
 
 .Card__Footer__Bookmark input {
@@ -416,11 +439,34 @@ body {
     width: 10rem;
 }
 
-.EditCardDialog__Type .Dropdown__preview {
-    background: #eee;
-    padding: .5rem;
+.EditCardDialog__Type .Dropdown__content {
+    width: max-content;
 }
 
+.EditCardDialog__Type .Dropdown__options {
+    width: fit-content;
+}
+
+.EditCardDialog__Type .Dropdown__option {
+    padding: 0;
+}
+
+.EditCardDialog__Type :is(.Dropdown__option>span, .Dropdown__value)  {    
+    padding: .3rem;
+    border-radius: .2rem;
+}
+
+.EditCardDialog__Type :is([data-value='Type 1']>span, [data-value='Type 1'] .Dropdown__value) {
+    background: var(--type-1);
+}
+
+.EditCardDialog__Type :is([data-value='Type 2']>span, [data-value='Type 2'] .Dropdown__value) {
+    background: var(--type-2);
+}
+
+.EditCardDialog__Type :is([data-value='Type 3']>span, [data-value='Type 3'] .Dropdown__value) {
+    background: var(--type-3);
+}
 
 .EditCardDialog__TextContent textarea {
     background: #eee;

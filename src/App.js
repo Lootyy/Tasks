@@ -21,9 +21,13 @@ function App() {
   const [availableProjects, setAvailableProjects] = useState(null)
   const [currentProject, setCurrentProject] = useState(null)
 
+  const userID = 'testuser'
+
+  // The loading functions are all kinds of messsed up to accomodate localstorage for ease of testing,
+  // the intent is for the bookmarks to be user specific, not project / board specific
 
   useEffect(() => {
-    loadBookmarks('testuser')
+    loadBookmarks(userID)
     loadProjects()
   }, [])
 
@@ -35,7 +39,7 @@ function App() {
   useEffect(() => {
     if (currentProject !== null)
     {
-      saveBookmarks('testuser')
+      saveBookmarks(userID)
       markBookmarked()
     }
   }, [bookmarks])
@@ -91,7 +95,18 @@ function App() {
   function createProject()
   {
     localStorage.setItem('projects', JSON.stringify([{id: 1, title: 'test project'}]))
-    localStorage.setItem('1', JSON.stringify([{id: uuidv4(), title: 'List 1', tasks: [{id: '3abc29ef2b1v3ca', title: 'Slightly bigger', content: 'Make more cards and make more lists, \n\n cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description'}]}]))
+    localStorage.setItem('1', JSON.stringify([{id: uuidv4(), title: 'Drag me', tasks: [
+                                                                                  {id: '1', title: 'Normal size', content: 'Cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description', taskType: 'Type 1'},
+                                                                                  {id: '3', title: 'Card', content: 'No way to delete cards individually just yet', tasks: [], preferredDisplay: 'Description', taskType: 'Type 2'},
+                                                                                  {id: '2', title: 'Slightly bigger', content: 'Of varying \n\n\n\n\n\n\n\n\n sizes', tasks: [], preferredDisplay: 'Description', taskType: 'Type 3'},
+                                                                                
+                                                                                ]},
+                                              {id: uuidv4(), title: 'Theres buttons too', tasks: [
+                                                                                  {id: '4', title: 'Normal size', content: 'Cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description'},
+                                                                                  {id: '5', title: 'Slightly bigger', content: 'Of varying \n\n\n\n\n\n\n\n\n sizes', tasks: [], preferredDisplay: 'Description'},
+                                                                                  {id: '6', title: 'Card', content: 'No way to delete cards individually just yet', tasks: [], preferredDisplay: 'Description'},                                                                                
+                                                                                ]},                                                                              
+                                                                              ]))
     loadProjects()
   }
 
@@ -182,7 +197,17 @@ function App() {
     let newCards = [...cards]
     let updatedCard = {...newCards[listPos].tasks[pos], ...card}
     newCards[listPos].tasks[pos] = updatedCard
+    updateCardInBookmarks(updatedCard)
     setCards(newCards)
+  }
+
+  //temporary for localstorage behavior
+  function updateCardInBookmarks(card)
+  {
+    let newBookmarks = [...bookmarks]
+    let bookmarkIndex = newBookmarks[0].tasks.findIndex(e => e.id === card.id)
+    newBookmarks[0].tasks[bookmarkIndex] = card
+    saveBookmarks(userID)
   }
 
   function setBookmark(id, value)
@@ -216,7 +241,7 @@ function App() {
   {
     this.id = uuidv4()
     this.title = 'New Card'
-    this.content = 'New Content'
+    this.content = 'Click the container to edit'
     this.tasks = []
     this.preferredDisplay = 'Description'
   }
@@ -224,13 +249,8 @@ function App() {
   function List()
   {
     this.id = uuidv4()
-    this.title = 'New List'
+    this.title = 'Drag me'
     this.tasks = []
-  }
-
-  function openCardModal({card, listID})
-  {
-    
   }
 
   return (

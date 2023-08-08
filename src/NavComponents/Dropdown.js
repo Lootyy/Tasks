@@ -37,22 +37,24 @@ const Dropdown = forwardRef(function Dropdown({title, current, options}, ref)
     return (
         <div ref={ref} className='Dropdown' data-expanded={expanded} data-value={selected}>
             <label className='Dropdown__label'>{title}</label>
-            <div className='Dropdown__preview' onClick={handleOnClick}>
-                <span className='Dropdown__value'>{selected}</span>
-                <svg className='Dropdown__indicator' viewBox='0 0 8 16'>
-                    <path d='M 0,3 L 7,8 L 0,13'></path>
-                </svg>
-            </div>
-            {
-                expanded && 
-                <ul className='Dropdown__options'>
+            <div className='Dropdown__content'>
+                <div className='Dropdown__preview' onClick={handleOnClick}>
+                    <span className='Dropdown__value'>{selected}</span>
+                    <svg className='Dropdown__indicator' viewBox='0 0 8 16'>
+                        <path d='M 0,3 L 7,8 L 0,13'></path>
+                    </svg>
+                </div>
                 {
-                    options.map((e,i) => {
-                        return <li key={i} onClick={() => handleOnItemClick(e)}>{e.title}</li>
-                    })
+                    expanded && 
+                    <ul className='Dropdown__options'>
+                    {
+                        options.map((e,i) => {
+                            return <li key={i} className='Dropdown__option' onClick={() => handleOnItemClick(e)} data-value={e.title}><span>{e.title}</span></li>
+                        })
+                    }
+                    </ul>
                 }
-                </ul>
-            }
+            </div>
         </div>
     )
 })

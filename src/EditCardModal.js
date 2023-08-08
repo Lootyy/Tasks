@@ -27,14 +27,14 @@ export default function EditCardModal({onSubmit, onClose, card})
         })
 
         _tasks = _tasks.filter(e => {
-            return e.text !== ''
+            return e.text.trim() !== ''
         })
         
         onSubmit({  title: titleRef.current.value,
                     content: textContentRef.current.value,
                     tasks: _tasks,
                     taskType: typeRef.current.getAttribute('data-value'),
-                    preferredDisplay: preferredDisplayRef.current.checked ? 'Description' : 'Tasks' })
+                    preferredDisplay: (!preferredDisplayRef.current.checked && _tasks.length != 0) ? 'Tasks' : 'Description'})
     }
 
     return (
