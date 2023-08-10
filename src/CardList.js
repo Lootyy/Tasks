@@ -8,6 +8,8 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
     const [menuOpen, setMenuOpen] = useState(false)
     const [transitioned, setTransitioned] = useState(false)
     const transitionTimeoutRef = useRef(null)
+    const scrollableContentRef = useRef(null)
+    const isScrolling = useRef(false)
 
     //todo track when card is dragged over
 
@@ -89,6 +91,17 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
         removeList(pos)
     }
 
+    function handleMouseWheel(e)
+    {
+        e.stopPropagation()
+        if (direction === 'Horizontal' && !e.shiftKey && !isScrolling.current)
+        {
+            scrollableContentRef.current.scrollLeft += e.deltaY * 3
+            isScrolling.current = true
+            setTimeout(() => isScrolling.current = false, 130)
+        }
+    }
+
     return (
         <div data-id={id} className={`CardList ${direction}`} draggable={draggable} onDrop={draggable ? handleDrop : undefined} onDragOver={e => e.preventDefault()} onDragStart={draggable ? handleDragStart : undefined} 
             onDragEnd={handleDragEnd} onDragEnter={draggable ? handleDragEnter : undefined} data-isdragging={isDragging ? 'true' : 'false'} data-menuopen={menuOpen ? 'true' : 'false'}
@@ -107,7 +120,7 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
                 </div>
                 }
             </div>
-            <div className='CardList__Content'>
+            <div ref={scrollableContentRef} className='CardList__Content' onWheel={handleMouseWheel}>
             {
                 cards.map((e,i) => {
                     return <Card key={e.id} id={e.id} pos={i} listPos={pos} title={e.title} tasks={e.tasks} taskType={e.taskType} content={e.content} dropOnCard={dropOnCard} 

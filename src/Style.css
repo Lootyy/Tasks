@@ -159,7 +159,7 @@ body {
     flex-direction: row;
     gap: 2rem;
     margin: 1rem;
-    flex-basis: 100%;
+    min-height: 0;
 }
 
 .CardList {    
@@ -168,6 +168,7 @@ body {
     flex: 0 0 14rem;
     position: relative;
     min-width: 0;
+    overflow: hidden;
 }
 
 .CardList[data-transitionedfrom='left']
@@ -203,21 +204,34 @@ body {
         transform: 0;
     }
 }
-.CardList_Area:has([data-isdragging='true']) /* prevents hover bug due to scroll change on dragged card removal from flow */
-{
-    padding-block-end: 14rem;
-}
 
 .CardList__Content {
     display: flex;
     flex-direction: column;
-    flex: 0 0 14rem;
+    overflow: hidden scroll;
+    margin-inline-end: -1.1rem;
+    padding-block-end: var(--dragging-card-height);
+}
+
+.CardList.Horizontal {
+    flex: 0 0 15rem;
+    min-height: 16rem;
+    overflow: hidden;
 }
 
 .CardList.Horizontal .CardList__Content {
     flex-direction: row;
     gap: 2rem;
     justify-content: flex-start;
+    overflow: scroll hidden;
+    flex: 0 0 15rem;
+    padding-block-end: 1rem;
+    padding-inline: 1rem;
+    scroll-behavior: smooth;
+}
+
+.CardList.Horizontal .CardList__Header {
+    padding-inline: 1rem;
 }
 
 .CardList__Header {
@@ -265,6 +279,15 @@ body {
     background-color: #fff;
 }
 
+.CardList[data-isdragging=true] {
+    overflow: visible;
+}
+
+.CardList[data-isdragging=true] .CardList__Content {
+    overflow: visible;
+    margin-inline-end: 0;
+}
+
 .Card_wrapper {
     background-color: transparent;
     padding-top: 1rem;
@@ -272,7 +295,7 @@ body {
     flex-direction: column;
     flex-basis: 13em;
     transition: gap 500ms;
-    transition-delay: 200ms;
+    transition-delay: 150ms;
     gap: 0;
 }
 
@@ -298,9 +321,8 @@ body {
     pointer-events: all;
 }
 
-.Card_wrapper::before
+.Card_wrapper > .Card_DropPreview
 {   
-    content: '';
     display: none;
     position: relative;
     width: 100%;
@@ -309,10 +331,10 @@ body {
     height: 0;
     display: block;
     transition: height 500ms;
-    transition-delay: 200ms;
+    transition-delay: 150ms;
 }
 
-.CardList.Horizontal .Card_wrapper::before 
+.CardList.Horizontal .Card_wrapper > .Card_DropPreview 
 {
     display: none;
     height: 100%;
@@ -324,7 +346,7 @@ body {
     transition: gap 0ms;
 }
 
-.Card_wrapper[data-droppedon=true]::before
+.Card_wrapper[data-droppedon=true] > .Card_DropPreview
 {
     transition: height 0ms;
     height: 0;
@@ -341,15 +363,15 @@ body {
     gap: 1rem;
 }
 
-.Card_wrapper[data-isdragover='true']::before
+.Card_wrapper[data-isdragover='true'] > .Card_DropPreview
 {   
-    height: calc(var(--dragging-card-height) - 1rem);    
+    height: var(--dragging-card-height);    
 }
 
-.Card_wrapper[data-pickedup=true] + .Card_wrapper::before
+.Card_wrapper[data-pickedup=true] + .Card_wrapper > .Card_DropPreview
 {
     transition: height 0ms;
-    height: calc(var(--dragging-card-height) - 1rem);
+    height: var(--dragging-card-height);
 }
 
 .Card {
@@ -462,9 +484,11 @@ body {
 }
 
 .FocusArea {
-    padding: 1rem;
+    padding-block: 1rem;
     display: flex;
     flex-direction: column;
+    position: sticky;
+    left: 0;
 }
 
 .Feed {

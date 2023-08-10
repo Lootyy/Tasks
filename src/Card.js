@@ -16,7 +16,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
     function handleDragStart(e)
     {
         e.dataTransfer.setDragImage(cardRef.current, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
-        setDraggingCardHeight(cardRef.current.parentElement.getBoundingClientRect().height)
+        setDraggingCardHeight(cardRef.current.getBoundingClientRect().height)
         e.stopPropagation()
         e.dataTransfer.setData(listType, JSON.stringify({id, pos, listPos}))
         e.dataTransfer.clearData('cardlist')        
@@ -98,6 +98,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         <div className='Card_wrapper' draggable={listType !== 'bookmark'} onDragStart={handleDragStart} onDrop={handleDrop} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
             onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} data-isdragover={dragOver + ''} data-isdragging={isDragging ? 'true' : 'false'}
             data-tasktype={taskType} onDrag={handleDrag} data-droppedon={droppedOn} data-pickedup={isPickedUp}>
+            <div className='Card_DropPreview' onDragLeave={e => e.stopPropagation()}></div>
             <div className='Card' ref={cardRef} onDragLeave={e => e.stopPropagation()}>
                 <div className='Card__Header'>
                     <span className='Card__Title'>{title}</span>
