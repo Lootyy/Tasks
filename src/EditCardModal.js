@@ -11,8 +11,6 @@ export default function EditCardModal({onSubmit, onClose, card})
     const typeRef = useRef(null)
     const preferredDisplayRef = useRef(null)
 
-    console.log(card)
-    
     useEffect(() => {
         dialogRef.current.showModal()
     }, [])

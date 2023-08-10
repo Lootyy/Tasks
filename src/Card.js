@@ -22,7 +22,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         e.dataTransfer.clearData('cardlist')        
     }
 
-    // set dragging flag in the ondrag event over dragstart to leave browser enough time to generate the bipmap from the dragged element before it gets display: none via css,
+    // set dragging flag in the ondrag event over dragstart to leave browser enough time to generate the bitmap from the dragged element before it gets display: none via css,
     function handleDrag()
     {
         if (!isDragging)

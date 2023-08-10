@@ -7,6 +7,7 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
     const [isDragging, setDragging] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
     const [transitioned, setTransitioned] = useState(false)
+    const transitionTimeoutRef = useRef(null)
 
     //todo track when card is dragged over
 
@@ -24,8 +25,9 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
     }, [])
 
     useEffect(() => {
+        clearTimeout(transitionTimeoutRef.current)
         setTransitioned(true)
-        setTimeout(() => setTransitioned(false), 500)
+        transitionTimeoutRef.current = setTimeout(() => setTransitioned(false), 300)
     }, [pos])
 
     
