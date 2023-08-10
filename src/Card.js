@@ -1,4 +1,4 @@
-import {useRef, useState, useEffect} from 'react'
+import {useRef, useState} from 'react'
 import EditCardModal from './EditCardModal'
 
 export default function Card({id, pos = 0, listPos = 0, title, content, tasks, taskType, dropOnCard, listType, bookmarked, setBookmark, updateCard,
@@ -7,6 +7,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
     const [isDragging, setIsDragging] = useState(false)
     const [isEditing, setIsEditing] = useState(openEditingModal)
     const [droppedOn, setDroppedOn] = useState(false)
+    const [isPickedUp, setPickedUp] = useState(false)
     const cardRef = useRef(null)
 
     const canEdit = listType !== 'bookmark'
@@ -14,7 +15,6 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
     
     function handleDragStart(e)
     {
-        let image = new Image()
         e.dataTransfer.setDragImage(cardRef.current, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
         setDraggingCardHeight(cardRef.current.parentElement.getBoundingClientRect().height)
         e.stopPropagation()
@@ -28,9 +28,11 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         if (!isDragging)
         {
             setIsDragging(true)
+            setPickedUp(true)
+            setTimeout(() => setPickedUp(false), 0)
         }
         if (dragOver)
-        setDragOver(false)
+            setDragOver(false)
     }
     
     function handleDragEnd(e)
@@ -52,7 +54,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
                 dropOnCard({inPos: pos, inListPos: listPos, outPos: dropped.pos, outListPos: dropped.listPos})
             setDragOver(false)
             setDroppedOn(true)
-            setTimeout(() => {setDroppedOn(false)}, 0)
+            setTimeout(() => {setDroppedOn(false)}, 10)
         }
     }
     
@@ -95,7 +97,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         <>
         <div className='Card_wrapper' draggable={listType !== 'bookmark'} onDragStart={handleDragStart} onDrop={handleDrop} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
             onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} data-isdragover={dragOver + ''} data-isdragging={isDragging ? 'true' : 'false'}
-             data-tasktype={taskType} onDrag={handleDrag} data-droppedon={droppedOn}>
+            data-tasktype={taskType} onDrag={handleDrag} data-droppedon={droppedOn} data-pickedup={isPickedUp}>
             <div className='Card' ref={cardRef} onDragLeave={e => e.stopPropagation()}>
                 <div className='Card__Header'>
                     <span className='Card__Title'>{title}</span>

@@ -272,6 +272,7 @@ body {
     flex-direction: column;
     flex-basis: 13em;
     transition: gap 500ms;
+    transition-delay: 200ms;
     gap: 0;
 }
 
@@ -285,7 +286,6 @@ body {
 {
     visibility: hidden;
     overflow: hidden;
-    transition: flex-basis 500ms;
     flex-basis: 0;
     padding: 0;
 }
@@ -309,10 +309,12 @@ body {
     height: 0;
     display: block;
     transition: height 500ms;
+    transition-delay: 200ms;
 }
 
 .CardList.Horizontal .Card_wrapper::before 
 {
+    display: none;
     height: 100%;
     width: 14rem;
 }
@@ -325,6 +327,7 @@ body {
 .Card_wrapper[data-droppedon=true]::before
 {
     transition: height 0ms;
+    height: 0;
 }
 
 .Card_wrapper[data-isdragover='true']
@@ -332,9 +335,21 @@ body {
     gap: 1rem;
 }
 
+.Card_wrapper[data-pickedup=true] + .Card_wrapper
+{
+    transition: gap 0ms;
+    gap: 1rem;
+}
+
 .Card_wrapper[data-isdragover='true']::before
 {   
     height: calc(var(--dragging-card-height) - 1rem);    
+}
+
+.Card_wrapper[data-pickedup=true] + .Card_wrapper::before
+{
+    transition: height 0ms;
+    height: calc(var(--dragging-card-height) - 1rem);
 }
 
 .Card {
