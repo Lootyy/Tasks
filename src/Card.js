@@ -2,26 +2,37 @@ import {useRef, useState, useEffect} from 'react'
 import EditCardModal from './EditCardModal'
 
 export default function Card({id, pos = 0, listPos = 0, title, content, tasks, taskType, dropOnCard, listType, bookmarked, setBookmark, updateCard,
-                            setDraggingCardHeight, preferredDisplay}) {
+                            setDraggingCardHeight, preferredDisplay, openEditingModal = false}) {
     const [dragOver, setDragOver] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
-    const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(openEditingModal)
+    const [droppedOn, setDroppedOn] = useState(false)
     const cardRef = useRef(null)
 
-    const canEdit = listType != 'bookmark'
+    const canEdit = listType !== 'bookmark'
 
     
     function handleDragStart(e)
     {
-        setDraggingCardHeight(cardRef.current.parentElement.getBoundingClientRect().height)
+        let image = new Image()
         e.dataTransfer.setDragImage(cardRef.current, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+        setDraggingCardHeight(cardRef.current.parentElement.getBoundingClientRect().height)
         e.stopPropagation()
-
-        setTimeout(() => setIsDragging(true), 0) // settimeout to introduce a delay in hiding the card, drag doesn't work when the element disappears instantly
         e.dataTransfer.setData(listType, JSON.stringify({id, pos, listPos}))
-        e.dataTransfer.clearData('cardlist')
+        e.dataTransfer.clearData('cardlist')        
     }
 
+    // set dragging flag in the ondrag event over dragstart to leave browser enough time to generate the bipmap from the dragged element before it gets display: none via css,
+    function handleDrag()
+    {
+        if (!isDragging)
+        {
+            setIsDragging(true)
+        }
+        if (dragOver)
+        setDragOver(false)
+    }
+    
     function handleDragEnd(e)
     {
         e.stopPropagation()
@@ -40,12 +51,13 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
             if (dropped.id !== id)
                 dropOnCard({inPos: pos, inListPos: listPos, outPos: dropped.pos, outListPos: dropped.listPos})
             setDragOver(false)
+            setDroppedOn(true)
+            setTimeout(() => {setDroppedOn(false)}, 0)
         }
     }
     
     function handleDragEnter(e)
     {
-        console.log(e)
         if (e.dataTransfer.types.indexOf(listType) !== -1)
         {
             e.stopPropagation()
@@ -76,14 +88,14 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
 
     function handleCardClick()
     {
-        console.log('clicked')
         setIsEditing(true)
     }
 
     return (
         <>
-        <div className='Card_wrapper' draggable={true} onDragStart={handleDragStart} onDrop={handleDrop} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
-            onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} data-isdragover={dragOver + ''} data-isdragging={isDragging ? 'true' : 'false'} data-tasktype={taskType}>
+        <div className='Card_wrapper' draggable={listType !== 'bookmark'} onDragStart={handleDragStart} onDrop={handleDrop} onDragOver={handleDragOver} onDragEnd={handleDragEnd}
+            onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} data-isdragover={dragOver + ''} data-isdragging={isDragging ? 'true' : 'false'}
+             data-tasktype={taskType} onDrag={handleDrag} data-droppedon={droppedOn}>
             <div className='Card' ref={cardRef} onDragLeave={e => e.stopPropagation()}>
                 <div className='Card__Header'>
                     <span className='Card__Title'>{title}</span>

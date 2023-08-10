@@ -20,6 +20,7 @@ function App() {
   const [draggingCardHeight, setDraggingCardHeight] = useState(0)
   const [availableProjects, setAvailableProjects] = useState(null)
   const [currentProject, setCurrentProject] = useState(null)
+  const [feed, setFeed] = useState([])
 
   const userID = 'testuser'
 
@@ -44,14 +45,22 @@ function App() {
     }
   }, [bookmarks])
 
+  useEffect(() => {    
+    if (currentProject !== null)
+    {
+      saveFeed()
+    }
+  }, [feed])
+
 
   function loadProjects()
   {
-    let projects = JSON.parse(localStorage.getItem('projects'))
+    let projects = JSON.parse(localStorage.getItem(userID + '_projects'))
      
     if (projects !== null)
     {
       loadCards(projects[0].id)
+      loadFeed(projects[0].id)
       setCurrentProject(projects[0])
     }
     setAvailableProjects(projects)
@@ -59,12 +68,12 @@ function App() {
 
   function saveCards(projectID)
   {    
-      localStorage.setItem(projectID + '', JSON.stringify(cards))
+      localStorage.setItem(projectID + '_cards', JSON.stringify(cards))
   }
 
   function loadCards(projectID)
   {
-    let cards = JSON.parse(localStorage.getItem(projectID + ''))
+    let cards = JSON.parse(localStorage.getItem(projectID + '_cards'))
     if (cards !== null)
       setCards(cards)
   }
@@ -82,20 +91,32 @@ function App() {
 
   function loadBookmarks(userID)
   {
-    let bookmarks = JSON.parse(localStorage.getItem(userID))
-    if (bookmarks != null)
+    let bookmarks = JSON.parse(localStorage.getItem(userID + '_bookmarks'))
+    if (bookmarks !== null)
       setBookmarks(bookmarks)
   }
 
   function saveBookmarks(userID)
   {
-    localStorage.setItem(userID, JSON.stringify(bookmarks))
+    localStorage.setItem(userID + '_bookmarks', JSON.stringify(bookmarks))
+  }
+
+  function saveFeed()
+  {
+    localStorage.setItem(currentProject.id + '_feed', JSON.stringify(feed))
+  }
+
+  function loadFeed(feedID)
+  {
+    let feed = JSON.parse(localStorage.getItem(feedID + '_feed'))
+    if (feed !== null)
+      setFeed(feed)
   }
 
   function createProject()
   {
-    localStorage.setItem('projects', JSON.stringify([{id: 1, title: 'test project'}]))
-    localStorage.setItem('1', JSON.stringify([{id: uuidv4(), title: 'Drag me', tasks: [
+    localStorage.setItem(userID + '_projects', JSON.stringify([{id: 1, title: 'test project'}]))
+    localStorage.setItem('1_cards', JSON.stringify([{id: uuidv4(), title: 'Drag me', tasks: [
                                                                                   {id: '1', title: 'Normal size', content: 'Cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description', taskType: 'Type 1'},
                                                                                   {id: '3', title: 'Card', content: 'No way to delete cards individually just yet', tasks: [], preferredDisplay: 'Description', taskType: 'Type 2'},
                                                                                   {id: '2', title: 'Slightly bigger', content: 'Of varying \n\n\n\n\n\n\n\n\n sizes', tasks: [], preferredDisplay: 'Description', taskType: 'Type 3'},
@@ -120,6 +141,9 @@ function App() {
     let newCards = [...cards]
     let newIndex = newCards.findIndex(list => list.id === toID)
     let oldIndex = newCards.findIndex(list => list.id === draggingListID.current)
+
+    newCards[oldIndex].transitionedFrom = oldIndex > newIndex ? 'right': 'left'
+    newCards[newIndex].transitionedFrom = oldIndex > newIndex ? 'left' : 'right'
     
     let list = newCards.splice(oldIndex, 1)[0]
     newCards.splice(newIndex, 0, list)
@@ -139,8 +163,6 @@ function App() {
 
   function dropOnList({inPos, inListPos, outPos, outListPos})
   {
-
-    console.log(outListPos)
     let newCards = [...cards]
     let card = newCards[outListPos].tasks.splice(outPos, 1)[0]
     newCards[inListPos].tasks.splice(inPos, 0, card)  
@@ -199,6 +221,7 @@ function App() {
     newCards[listPos].tasks[pos] = updatedCard
     updateCardInBookmarks(updatedCard)
     setCards(newCards)
+    setFeed([`${userID} updated task: ${updatedCard.title}` ,...feed])
   }
 
   //temporary for localstorage behavior
@@ -244,6 +267,7 @@ function App() {
     this.content = 'Click the container to edit'
     this.tasks = []
     this.preferredDisplay = 'Description'
+    this.isNew = true
   }
 
   function List()
@@ -266,12 +290,13 @@ function App() {
                 cards.map((e,i) => {
                   return <CardList key={e.id} id={e.id} pos={i} title={e.title} cards={e.tasks} type='task' dropOnCard={dropOnCard_Cards} addCard={addCard} dropOnList={dropOnList}
                   setDraggingList={setDraggingList} moveList={moveList} insertList={insertList} addList={addList} draggable={true} displayMenu={true}
-                  setBookmark={setBookmark} updateCard={updateCard} removeList={removeList} setDraggingCardHeight={(height) => setDraggingCardHeight(height)}></CardList>
+                  setBookmark={setBookmark} updateCard={updateCard} removeList={removeList} setDraggingCardHeight={(height) => setDraggingCardHeight(height)}
+                  transitionedFrom={Object.hasOwn(e, 'transitionedFrom') && e.transitionedFrom}></CardList>
                 })
               }
           </div>
           </div>
-          <Feed></Feed>
+          <Feed data={feed}></Feed>
         </>
         :
         <div className='no_content'>No project is available

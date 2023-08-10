@@ -34,7 +34,7 @@ export default function EditCardModal({onSubmit, onClose, card})
                     content: textContentRef.current.value,
                     tasks: _tasks,
                     taskType: typeRef.current.getAttribute('data-value'),
-                    preferredDisplay: (!preferredDisplayRef.current.checked && _tasks.length != 0) ? 'Tasks' : 'Description'})
+                    preferredDisplay: (!preferredDisplayRef.current.checked && _tasks.length !== 0) ? 'Tasks' : 'Description'})
     }
 
     return (

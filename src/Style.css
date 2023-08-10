@@ -168,8 +168,42 @@ body {
     flex: 0 0 14rem;
     position: relative;
     min-width: 0;
+    transition: transform 500ms;
 }
 
+.CardList[data-transitionedfrom='left']
+{
+    animation: transitionListLeft 500ms;
+}
+
+.CardList[data-transitionedfrom='right']
+{
+    animation: transitionListRight 500ms;
+}
+
+@keyframes transitionListLeft
+{
+    from {
+        transform: translate(calc(-100% - 2rem));
+        pointer-events: none;
+    }
+    
+    to {
+        pointer-events: none;
+        transform: 0;
+    }
+}
+
+@keyframes transitionListRight
+{
+    from {
+        transform: translate(calc(100% + 2rem));
+    }
+    
+    to {
+        transform: 0;
+    }
+}
 .CardList_Area:has([data-isdragging='true']) /* prevents hover bug due to scroll change on dragged card removal from flow */
 {
     padding-block-end: 14rem;
@@ -237,7 +271,9 @@ body {
     padding-top: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    flex-basis: 13em;
+    transition: gap 500ms;
+    gap: 0;
 }
 
 .CardList.Horizontal .Card_wrapper {
@@ -248,7 +284,11 @@ body {
 
 .Card_wrapper[data-isdragging=true]
 {
-    display: none;
+    visibility: hidden;
+    overflow: hidden;
+    transition: flex-basis 500ms;
+    flex-basis: 0;
+    padding: 0;
 }
 
 .Card_wrapper[data-isdragover=true] * {
@@ -266,18 +306,36 @@ body {
     position: relative;
     width: 100%;
     background-color: #ccc;
-    height: calc(var(--dragging-card-height) - 1rem);
     box-shadow: 0 0 1rem #ccc;
+    height: 0;
+    display: block;
+    transition: height 500ms;
 }
 
-.CardList.Horizontal .Card_wrapper::before {
+.CardList.Horizontal .Card_wrapper::before 
+{
     height: 100%;
     width: 14rem;
 }
 
+.Card_wrapper[data-droppedon=true]
+{
+    transition: gap 0ms;
+}
+
+.Card_wrapper[data-droppedon=true]::before
+{
+    transition: height 0ms;
+}
+
+.Card_wrapper[data-isdragover='true']
+{
+    gap: 1rem;
+}
+
 .Card_wrapper[data-isdragover='true']::before
-{    
-    display: block;
+{   
+    height: calc(var(--dragging-card-height) - 1rem);    
 }
 
 .Card {
