@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import {v4 as uuidv4} from 'uuid';
 
 import './Style.css';
-import Nav from './Nav.js'
+import Sidebar from './Sidebar.js'
 import FocusArea from './FocusArea.js'
 import CardList from './CardList'
 import Feed from './Feed.js'
+import Navbar from './Navbar';
 
 
 function App() {
@@ -67,8 +68,10 @@ function App() {
   }
 
   function saveCards(projectID)
-  {    
-      localStorage.setItem(projectID + '_cards', JSON.stringify(cards))
+  {   
+      let newCards = [...cards]
+      newCards.forEach(e => delete e.transitionedFrom)
+      localStorage.setItem(projectID + '_cards', JSON.stringify(newCards))
   }
 
   function loadCards(projectID)
@@ -279,12 +282,13 @@ function App() {
 
   return (
     <div id='app' style={{'--dragging-card-height': `${draggingCardHeight}px`}}>
-      <Nav currentProject={currentProject} availableProjects={availableProjects}></Nav>
+      <Sidebar currentProject={currentProject} availableProjects={availableProjects}></Sidebar>
       {
         availableProjects !== null ?
         <>
           <div className='CardArea'>
           <FocusArea bookmarks={bookmarks} dropOnCard={dropOnCard_Bookmarks} setBookmark={setBookmark}></FocusArea>
+          <Navbar></Navbar>
           <div className='CardList_Area'>
               {
                 cards.map((e,i) => {

@@ -7,10 +7,13 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
     const [isDragging, setDragging] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
     const [transitioned, setTransitioned] = useState(false)
+    const [isMinimized, setMinimized] = useState(false)
+
     const transitionTimeoutRef = useRef(null)
     const scrollableContentRef = useRef(null)
     const isScrolling = useRef(false)
 
+    const displayMinimizeButton = direction === 'Horizontal'
     //todo track when card is dragged over
 
     useEffect(() => {
@@ -57,6 +60,7 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
         e.dataTransfer.clearData(type)
         setDraggingList(id)
         setDragging(true)
+        setMenuOpen(false)
     }
 
     function handleDragEnd(e)
@@ -98,36 +102,51 @@ export default function CardList({ id, pos = 0, title, cards, type, dropOnCard, 
         {
             scrollableContentRef.current.scrollLeft += e.deltaY * 3
             isScrolling.current = true
-            setTimeout(() => isScrolling.current = false, 130)
+            setTimeout(() => isScrolling.current = false, 160)
         }
+    }
+
+    function handleMinimize(e)
+    {
+        setMinimized(!isMinimized)
     }
 
     return (
         <div data-id={id} className={`CardList ${direction}`} draggable={draggable} onDrop={draggable ? handleDrop : undefined} onDragOver={e => e.preventDefault()} onDragStart={draggable ? handleDragStart : undefined} 
             onDragEnd={handleDragEnd} onDragEnter={draggable ? handleDragEnter : undefined} data-isdragging={isDragging ? 'true' : 'false'} data-menuopen={menuOpen ? 'true' : 'false'}
-            data-transitionedfrom={transitioned ? transitionedFrom : undefined}>
+            data-transitionedfrom={transitioned ? transitionedFrom : undefined} data-isminimized={isMinimized}>
             <div className='CardList__Header'>
                 <span>{title}</span>
+                <div className='CardList__Controls'>
                 {
                     displayMenu && 
-                    <div className='CardList__Controls'>
-                    <svg className="CardList__Controls__Add" viewBox="0 0 20 20" onClick={handleAddCard}>
-                                <path d='M 10,0 L 10,20 M 20,10 L 0,10'></path>
-                    </svg>
-                    <svg className="CardList__Controls__Menu HamburgerMenu" viewBox="0 0 15 10" onClick={handleOpenMenu}>
-                            <path d='M 0,1 L 15,1 M 0,5 L 15,5 M 0,9 L 15,9'></path>
-                    </svg>
-                </div>
+                    <>
+                        <svg className="CardList__Controls__Add" viewBox="0 0 20 20" onClick={handleAddCard}>
+                                    <path d='M 10,0 L 10,20 M 20,10 L 0,10'></path>
+                        </svg>
+                        <svg className="CardList__Controls__Menu HamburgerMenu" viewBox="0 0 15 10" onClick={handleOpenMenu}>
+                                <path d='M 0,1 L 15,1 M 0,5 L 15,5 M 0,9 L 15,9'></path>
+                        </svg>
+                    </>
                 }
+                {
+                    displayMinimizeButton && 
+                    <div className='CardList__Controls__Minimize' onClick={handleMinimize}>
+                        M
+                    </div>
+                }
+                </div>
             </div>
-            <div ref={scrollableContentRef} className='CardList__Content' onWheel={handleMouseWheel}>
-            {
-                cards.map((e,i) => {
-                    return <Card key={e.id} id={e.id} pos={i} listPos={pos} title={e.title} tasks={e.tasks} taskType={e.taskType} content={e.content} dropOnCard={dropOnCard} 
-                    listType={type} bookmarked={Object.hasOwn(e, 'isBookmarked') ? e.isBookmarked : false}
-                    setBookmark={setBookmark} updateCard={updateCard} setDraggingCardHeight={setDraggingCardHeight} preferredDisplay={e.preferredDisplay}></Card>
-                })
-            }
+            <div className='CardList__Content_wrapper'>
+                <div ref={scrollableContentRef} className='CardList__Content' onWheel={handleMouseWheel}>
+                {
+                    cards.map((e,i) => {
+                        return <Card key={e.id} id={e.id} pos={i} listPos={pos} title={e.title} tasks={e.tasks} taskType={e.taskType} content={e.content} dropOnCard={dropOnCard} 
+                        listType={type} bookmarked={Object.hasOwn(e, 'isBookmarked') ? e.isBookmarked : false}
+                        setBookmark={setBookmark} updateCard={updateCard} setDraggingCardHeight={setDraggingCardHeight} preferredDisplay={e.preferredDisplay}></Card>
+                    })
+                }
+                </div>
             </div>
             {
                 menuOpen && 

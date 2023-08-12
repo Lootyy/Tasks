@@ -6,9 +6,9 @@
     display: grid;
     grid-template-columns: 1fr 6fr 1fr;
     grid-template-rows: 10rem auto;
-    grid-template-areas:    'nav cards feed'
-                            'nav cards feed'
-                            'nav cards feed';
+    grid-template-areas:    'Sidebar cards feed'
+                            'Sidebar cards feed'
+                            'Sidebar cards feed';
     height: 100vh;
 
     --type-1: #ff7575;
@@ -28,11 +28,11 @@ body {
     font-family: sans-serif;
 }
 
-.Nav {
-    grid-area: nav;
+.Sidebar {
+    grid-area: Sidebar;
 }
 
-.Nav__User {
+.Sidebar__User {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,7 +40,7 @@ body {
     gap: 1rem;
 }
 
-.Nav__User__Controls {
+.Sidebar__User__Controls {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -48,7 +48,7 @@ body {
     width: 50%;
 }
 
-.Nav__User__Picture 
+.Sidebar__User__Picture 
 {
     aspect-ratio: 1 / 1;
     width: 5rem;
@@ -56,19 +56,19 @@ body {
     background-color: #ddd;
 }
 
-.Nav__User__Controls__Menu 
+.Sidebar__User__Controls__Menu 
 {
     stroke: #555;
 }
 
-.Nav__User__Controls__Messages
+.Sidebar__User__Controls__Messages
 {
     background-color: aqua;
     width: 2rem;
     height: 2rem;
 }
 
-.Nav__Header {
+.Sidebar__Header {
     background: #fff;
     padding: 1rem;
 }
@@ -151,7 +151,7 @@ body {
     display: flex;
     flex-direction: column;
     max-width: 100%;
-    overflow: scroll visible;
+    overflow: scroll hidden;
 }
 
 .CardList_Area {
@@ -160,6 +160,8 @@ body {
     gap: 2rem;
     margin: 1rem;
     min-height: 0;
+    width: max-content;
+    padding-inline-end: 1rem;
 }
 
 .CardList {    
@@ -168,7 +170,6 @@ body {
     flex: 0 0 14rem;
     position: relative;
     min-width: 0;
-    overflow: hidden;
 }
 
 .CardList[data-transitionedfrom='left']
@@ -205,18 +206,29 @@ body {
     }
 }
 
+.CardList__Content_wrapper {
+    overflow: hidden;
+    margin-block-end: -1.1rem;
+}
+
 .CardList__Content {
     display: flex;
     flex-direction: column;
     overflow: hidden scroll;
     margin-inline-end: -1.1rem;
-    padding-block-end: var(--dragging-card-height);
+    padding-block-end: max(14rem, var(--dragging-card-height));
+    height: 100%;
 }
 
 .CardList.Horizontal {
-    flex: 0 0 15rem;
-    min-height: 16rem;
+    transition: flex 500ms;
+    flex: 0 0 16rem;
     overflow: hidden;
+}
+
+.CardList.Horizontal[data-isminimized=true]
+{
+    flex: 0 0 2rem;
 }
 
 .CardList.Horizontal .CardList__Content {
@@ -226,8 +238,10 @@ body {
     overflow: scroll hidden;
     flex: 0 0 15rem;
     padding-block-end: 1rem;
+    margin-inline-end: 0;
     padding-inline: 1rem;
     scroll-behavior: smooth;
+    min-height: 15rem;
 }
 
 .CardList.Horizontal .CardList__Header {
@@ -283,6 +297,10 @@ body {
     overflow: visible;
 }
 
+.CardList[data-isdragging=true] .CardList__Content_wrapper {
+    overflow: visible;
+}
+
 .CardList[data-isdragging=true] .CardList__Content {
     overflow: visible;
     margin-inline-end: 0;
@@ -307,7 +325,6 @@ body {
 
 .Card_wrapper[data-isdragging=true]
 {
-    visibility: hidden;
     overflow: hidden;
     flex-basis: 0;
     padding: 0;
@@ -332,6 +349,7 @@ body {
     display: block;
     transition: height 500ms;
     transition-delay: 150ms;
+    border-radius: .3rem;
 }
 
 .CardList.Horizontal .Card_wrapper > .Card_DropPreview 
@@ -489,6 +507,14 @@ body {
     flex-direction: column;
     position: sticky;
     left: 0;
+}
+
+.Navbar {
+    background: #fff;
+    flex: 0 0 2rem;
+    margin-inline: 1rem;
+    position: sticky;
+    left: 1rem;
 }
 
 .Feed {

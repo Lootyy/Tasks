@@ -5,8 +5,6 @@ import CardList from './CardList'
 
 export default function CardArea({ cards, dropOnCard, dropOnList, setDraggingList, moveList })
 {
-
-
     return (
         <div className='CardArea'>
             {

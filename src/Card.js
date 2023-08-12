@@ -29,7 +29,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         {
             setIsDragging(true)
             setPickedUp(true)
-            setTimeout(() => setPickedUp(false), 0)
+            setTimeout(() => setPickedUp(false), 5) // cant be too long because of instant repeated drops
         }
         if (dragOver)
             setDragOver(false)
@@ -45,6 +45,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
     {
         if (e.dataTransfer.types.indexOf(listType) !== -1)
         {
+            setDragOver(false)
             e.preventDefault()
             e.stopPropagation()
             let dropped = JSON.parse(e.dataTransfer.getData(listType))
@@ -52,7 +53,6 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
                 pos--
             if (dropped.id !== id)
                 dropOnCard({inPos: pos, inListPos: listPos, outPos: dropped.pos, outListPos: dropped.listPos})
-            setDragOver(false)
             setDroppedOn(true)
             setTimeout(() => {setDroppedOn(false)}, 10)
         }
