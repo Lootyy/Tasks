@@ -78,18 +78,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: .5rem;
-}
-
-.Dropdown__label {
-    font-weight: bold;
+    position: relative;
 }
 
 .Dropdown[data-expanded=true] .Dropdown__indicator {
     transform: rotate(-90deg) rotateY(180deg);
-}
-
-.Dropdown__content {    
-    position: relative; 
 }
 
 .Dropdown__preview {
@@ -146,6 +139,28 @@ body {
     background: #ccc;
 }
 
+.Typeahead {
+    position: relative;
+}
+
+.Typeahead__preview {
+    display: flex;
+    align-items: center;
+}
+
+.Typeahead__Input {
+    padding: .5rem;
+}
+
+.Typeahead .Dropdown__indicator {
+    position: absolute;
+    right: .5rem;
+}
+
+.Typeahead[data-expanded=true] .Dropdown__indicator {    
+    transform: rotate(-90deg) rotateY(180deg);
+}
+
 .CardArea {
     grid-area: cards;
     display: flex;
@@ -169,7 +184,7 @@ body {
     flex-direction: column;
     flex: 0 0 14rem;
     position: relative;
-    min-width: 0;
+    min-width: 14rem;
 }
 
 .CardList[data-transitionedfrom='left']
@@ -224,6 +239,34 @@ body {
     transition: flex 500ms;
     flex: 0 0 16rem;
     overflow: hidden;
+    animation: appear 1000ms;
+}
+
+@keyframes appear
+{
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.CardList.Horizontal .CardList__Content{
+    transform: translateY(-100%);
+    animation: 800ms fly-in cubic-bezier(0.04, 0.65, 0.8, 1.1) 500ms forwards;
+}
+
+@keyframes fly-in
+{
+    from {
+        transform: translateY(-120%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
 }
 
 .CardList.Horizontal[data-isminimized=true]
@@ -231,21 +274,33 @@ body {
     flex: 0 0 2rem;
 }
 
-.CardList.Horizontal .CardList__Content {
-    flex-direction: row;
-    gap: 2rem;
-    justify-content: flex-start;
-    overflow: scroll hidden;
-    flex: 0 0 15rem;
-    padding-block-end: 1rem;
-    margin-inline-end: 0;
-    padding-inline: 1rem;
-    scroll-behavior: smooth;
-    min-height: 15rem;
+.CardList.Horizontal .CardList__Header {
+    margin-inline: 1rem;
+}   
+
+.CardList.Horizontal .CardList__Content_wrapper {
+    transform-origin: top right;
+    width: 14rem;
+    transform: rotate(-90deg) translateY(-14rem);
+    min-height: var(--parent-width, 100vw);
+    height: var(--parent-width, 100vw);
+    flex: 0 0 14rem;
+    min-width: 0;
+}  
+
+.CardList.Horizontal .Card_wrapper {
+    width: 14rem;
+    height: 14rem;
+    margin-block: 1rem;
 }
 
-.CardList.Horizontal .CardList__Header {
-    padding-inline: 1rem;
+.CardList.Horizontal .Card {
+    transform: rotate(90deg) translateZ(0); /* translateZ to fix webkit text glitches with rotates */
+    flex-basis: 14rem;
+}
+
+.CardList.Horizontal .CardList__Content {
+    padding-block-end: 1rem;
 }
 
 .CardList__Header {
@@ -320,7 +375,8 @@ body {
 .CardList.Horizontal .Card_wrapper {
     flex-direction: row;
     gap: 2rem;
-    max-height: 14rem;
+    flex: 0 0 13rem;
+    max-height: 13rem;
 }
 
 .Card_wrapper[data-isdragging=true]
@@ -402,11 +458,6 @@ body {
     flex-direction: column;
     gap: .5rem;
     max-height: 300px;
-}
-
-.CardList.Horizontal .Card {
-    flex-basis: 14rem;
-    width: 14rem;
 }
 
 .Card__Header {
@@ -509,12 +560,106 @@ body {
     left: 0;
 }
 
+.FocusArea_bookmarks_loading {
+    flex: 0 0 16rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.FocusArea_bookmarks_loading .spinner {
+    width: 4rem;
+    stroke-width: 5px;
+}
+
+.FocusArea_bookmarks_loading .spinner_background {
+    stroke: #606F7B;
+}
+
+.FocusArea_bookmarks_loading .spinner_highlight {
+    stroke: #fff;
+    stroke-width: 6px;
+    stroke-dasharray: 42.8 20;
+    animation: spin 1500ms linear infinite;
+}
+
+@keyframes spin {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: 125.6
+    }
+}
+
 .Navbar {
-    background: #fff;
-    flex: 0 0 2rem;
     margin-inline: 1rem;
     position: sticky;
     left: 1rem;
+    display: grid;
+    padding: .5rem;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    z-index: 10;
+}
+
+.Navbar .Dropdown__preview {
+    background: white;
+    padding: .2rem .5rem;
+}
+
+.Navbar .left {
+    padding-inline: 1rem;
+    grid-column: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.Navbar .center {
+    grid-column: 2;
+}
+
+.Navbar .right {
+    display: flex;
+    align-items: center;
+    grid-column: 3;
+    padding-inline: 1rem;
+}
+
+.Navbar__Search {
+    padding: .3rem;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    text-align: center;
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 10000;
+    transform: translateZ(0);
+}
+
+
+.Navbar__Search:focus {
+    outline: none;
+    border: 2px solid #888;
+}
+
+.Navbar__ClearButton {
+    border: none;
+    margin-left: auto;
+    padding: .5rem 1rem;
+    transition: color 500ms, background 500ms, transform 200ms;
+    border-radius: 1rem;
+    cursor: pointer;
+    background: #fff;
+}
+
+.Navbar__ClearButton:hover {
+    color: #fff;
+    background: #333;
+    transform: scale(1.1);
 }
 
 .Feed {
@@ -561,32 +706,33 @@ body {
     width: 10rem;
 }
 
-.EditCardDialog__Type .Dropdown__content {
+
+.Dropdown[data-type='Type'] {
     width: max-content;
 }
 
-.EditCardDialog__Type .Dropdown__options {
+.Dropdown[data-type='Type'] .Dropdown__options {
     width: fit-content;
 }
 
-.EditCardDialog__Type .Dropdown__option {
+.Dropdown[data-type='Type'] .Dropdown__option {
     padding: 0;
 }
 
-.EditCardDialog__Type :is(.Dropdown__option>span, .Dropdown__value)  {    
+.Dropdown[data-type='Type'] :is(.Dropdown__option>span, .Dropdown__value)  {    
     padding: .3rem;
     border-radius: .2rem;
 }
 
-.EditCardDialog__Type :is([data-value='Type 1']>span, [data-value='Type 1'] .Dropdown__value) {
+.Dropdown[data-type='Type'] :is([data-value='Type 1']>span, [data-value='Type 1'] .Dropdown__value) {
     background: var(--type-1);
 }
 
-.EditCardDialog__Type :is([data-value='Type 2']>span, [data-value='Type 2'] .Dropdown__value) {
+.Dropdown[data-type='Type'] :is([data-value='Type 2']>span, [data-value='Type 2'] .Dropdown__value) {
     background: var(--type-2);
 }
 
-.EditCardDialog__Type :is([data-value='Type 3']>span, [data-value='Type 3'] .Dropdown__value) {
+.Dropdown[data-type='Type']  :is([data-value='Type 3']>span, [data-value='Type 3'] .Dropdown__value) {
     background: var(--type-3);
 }
 

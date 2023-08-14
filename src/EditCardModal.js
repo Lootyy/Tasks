@@ -44,7 +44,7 @@ export default function EditCardModal({onSubmit, onClose, card})
                     <span>Assignee</span>
                 </div>
                 <div className='EditCardDialog__Type'>
-                    <Dropdown ref={typeRef} title='Type' current={card.taskType !== undefined ? card.taskType : 'Type 1'} options={[{title:'Type 1'}, {title:'Type 2'}, {title:'Type 3'}]}></Dropdown>
+                    <Dropdown ref={typeRef} type='Type' title='Type' current={card.taskType !== undefined ? card.taskType : 'Type 1'} options={[{title:'Type 1'}, {title:'Type 2'}, {title:'Type 3'}]}></Dropdown>
                 </div>
                 <div className="EditCardDialog__TextContent">
                     <label htmlFor='textContent'>Description</label>

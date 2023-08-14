@@ -1,7 +1,25 @@
+import { useEffect, useRef } from "react"
 import Dropdown from "./NavComponents/Dropdown"
 
-export default function Sidebar({currentProject, availableProjects})
+export default function Sidebar({currentProject, availableProjects, setProject})
 {
+    const dropdownRef = useRef(null)
+
+    useEffect(() => {
+        let dropdown = dropdownRef.current
+
+        function changeHandler(e)
+        {
+            let selectedProject = availableProjects.find(el => el.title === e.value)
+            setProject(selectedProject)
+        }
+        dropdown.addEventListener('change', changeHandler)
+
+        return (() => {
+            dropdown.removeEventListener('change', changeHandler)
+        })
+    },[])
+
     return (
         <div className='Sidebar'>
             <div className='Sidebar__Header'>
@@ -16,7 +34,7 @@ export default function Sidebar({currentProject, availableProjects})
                 </div>
                 {
                     availableProjects &&
-                    <Dropdown title='Project' current={currentProject.title} options={availableProjects}></Dropdown>
+                    <Dropdown ref={dropdownRef} title='Project' current={currentProject && currentProject.title} options={availableProjects}></Dropdown>
                 }
             </div>
         </div>

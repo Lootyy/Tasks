@@ -1,13 +1,15 @@
 import {useRef, useState} from 'react'
 import EditCardModal from './EditCardModal'
 
-export default function Card({id, pos = 0, listPos = 0, title, content, tasks, taskType, dropOnCard, listType, bookmarked, setBookmark, updateCard,
-                            setDraggingCardHeight, preferredDisplay, openEditingModal = false}) {
+export default function Card({id, pos = 0, listPos = 0, title, content, tasks, taskType, dropOnCard, listType, bookmarked, updateCard,
+                            setDraggingCardHeight, preferredDisplay, toggleBookmark}) {
     const [dragOver, setDragOver] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
-    const [isEditing, setIsEditing] = useState(openEditingModal)
+    const [isEditing, setIsEditing] = useState(false)
     const [droppedOn, setDroppedOn] = useState(false)
     const [isPickedUp, setPickedUp] = useState(false)
+    const [isBookmarked, setBookmarked] = useState(bookmarked)
+
     const cardRef = useRef(null)
 
     const canEdit = listType !== 'bookmark'
@@ -83,14 +85,14 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
         }
     }
 
-    function handleBookmark(e)
-    {
-        setBookmark(id, e.target.checked)
-    }
-
     function handleCardClick()
     {
         setIsEditing(true)
+    }
+
+    function handleToggleBookmark(e)
+    {
+        toggleBookmark({pos, listPos})
     }
 
     return (
@@ -131,7 +133,7 @@ export default function Card({id, pos = 0, listPos = 0, title, content, tasks, t
                         tasks.length !== 0 ? <div className='Card_Footer_Progress'><span>{`${tasks.reduce((acc, val) => acc + (val.checked ? 1 : 0), 0)}/${tasks.length}`}</span></div> : undefined
                     }
                     <div className='Card__Footer__Bookmark'>
-                        <input type='checkbox' onChange={handleBookmark} checked={bookmarked}></input>
+                        <input type='checkbox' checked={bookmarked} onChange={handleToggleBookmark}></input>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -1 19 18" fill='none'> <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/> </svg>
                     </div>
                 </div>

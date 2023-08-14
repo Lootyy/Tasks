@@ -7,304 +7,94 @@ import FocusArea from './FocusArea.js'
 import CardList from './CardList'
 import Feed from './Feed.js'
 import Navbar from './Navbar';
+import useFetch from './useFetch';
+import CardListArea from './CardListArea';
+import useBookmarks from './useBookmarks';
 
 
 function App() {
-  /* const [cards, setCards] = useState([    {id: uuidv4(), title: 'List 1', tasks: [{id: uuidv4(), title: 'Card 1'}, {id: uuidv4(), title: 'Card 2'}]},
-                                          {id: uuidv4(), title: 'List 2', tasks: [{id: uuidv4(), title: 'Card 3'}, {id: uuidv4(), title: 'Card 4'}]},
-                                          {id: uuidv4(), title: 'List 3', tasks: [{id: uuidv4(), title: 'Card 3'}, {id: uuidv4(), title: 'Card 4'}]}])
- */
+  const userID = 1
 
-  const [cards, setCards] = useState([])
-  const [bookmarks, setBookmarks] = useState([{tasks: []}])
-  const draggingListID = useRef(null)
-  const [draggingCardHeight, setDraggingCardHeight] = useState(0)
-  const [availableProjects, setAvailableProjects] = useState(null)
+  const {data: availableProjects, setData: setAvailableProjects, pending: projectsPending, error: projectsError} = useFetch(`/users/${userID}`)
+  const {data: bookmarks, setData: setBookmarks, pending: bookmarksPending, error: bookmarksError} = useFetch(`getBookmarks?user=${userID}`, [])
   const [currentProject, setCurrentProject] = useState(null)
-  const [feed, setFeed] = useState([])
+  const [filter, setFilter] = useState({query: ''})
 
-  const userID = 'testuser'
-
-  // The loading functions are all kinds of messsed up to accomodate localstorage for ease of testing,
-  // the intent is for the bookmarks to be user specific, not project / board specific
-
-  useEffect(() => {
-    loadBookmarks(userID)
-    loadProjects()
-  }, [])
-
-  useEffect(() => {
-    if (currentProject !== null)
-      saveCards(currentProject.id)
-  }, [cards])
-
-  useEffect(() => {
-    if (currentProject !== null)
-    {
-      saveBookmarks(userID)
-      markBookmarked()
-    }
-  }, [bookmarks])
-
-  useEffect(() => {    
-    if (currentProject !== null)
-    {
-      saveFeed()
-    }
-  }, [feed])
-
-
-  function loadProjects()
+  function setProject(project)
   {
-    let projects = JSON.parse(localStorage.getItem(userID + '_projects'))
-     
-    if (projects !== null)
-    {
-      loadCards(projects[0].id)
-      loadFeed(projects[0].id)
-      setCurrentProject(projects[0])
-    }
-    setAvailableProjects(projects)
+    setCurrentProject(project)
   }
 
-  function saveCards(projectID)
-  {   
-      let newCards = [...cards]
-      newCards.forEach(e => delete e.transitionedFrom)
-      localStorage.setItem(projectID + '_cards', JSON.stringify(newCards))
-  }
-
-  function loadCards(projectID)
-  {
-    let cards = JSON.parse(localStorage.getItem(projectID + '_cards'))
-    if (cards !== null)
-      setCards(cards)
-  }
-
-  function markBookmarked()
-  {
-    let newCards = [...cards]
-    newCards.forEach(list => { // mark bookmarks
-      list.tasks.forEach(task => {
-        task.isBookmarked = (bookmarks[0].tasks.findIndex(e => e.id === task.id) !== -1)
-      })
-    })
-    setCards(newCards)
-  }
-
-  function loadBookmarks(userID)
-  {
-    let bookmarks = JSON.parse(localStorage.getItem(userID + '_bookmarks'))
-    if (bookmarks !== null)
-      setBookmarks(bookmarks)
-  }
-
-  function saveBookmarks(userID)
-  {
-    localStorage.setItem(userID + '_bookmarks', JSON.stringify(bookmarks))
-  }
-
-  function saveFeed()
-  {
-    localStorage.setItem(currentProject.id + '_feed', JSON.stringify(feed))
-  }
-
-  function loadFeed(feedID)
-  {
-    let feed = JSON.parse(localStorage.getItem(feedID + '_feed'))
-    if (feed !== null)
-      setFeed(feed)
-  }
-
-  function createProject()
-  {
-    localStorage.setItem(userID + '_projects', JSON.stringify([{id: 1, title: 'test project'}]))
-    localStorage.setItem('1_cards', JSON.stringify([{id: uuidv4(), title: 'Drag me', tasks: [
-                                                                                  {id: '1', title: 'Normal size', content: 'Cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description', taskType: 'Type 1'},
-                                                                                  {id: '3', title: 'Card', content: 'No way to delete cards individually just yet', tasks: [], preferredDisplay: 'Description', taskType: 'Type 2'},
-                                                                                  {id: '2', title: 'Slightly bigger', content: 'Of varying \n\n\n\n\n\n\n\n\n sizes', tasks: [], preferredDisplay: 'Description', taskType: 'Type 3'},
-                                                                                
-                                                                                ]},
-                                              {id: uuidv4(), title: 'Theres buttons too', tasks: [
-                                                                                  {id: '4', title: 'Normal size', content: 'Cards are draggable via native html5 drag&drop api \n\n lists are draggable too', tasks: [], preferredDisplay: 'Description'},
-                                                                                  {id: '5', title: 'Slightly bigger', content: 'Of varying \n\n\n\n\n\n\n\n\n sizes', tasks: [], preferredDisplay: 'Description'},
-                                                                                  {id: '6', title: 'Card', content: 'No way to delete cards individually just yet', tasks: [], preferredDisplay: 'Description'},                                                                                
-                                                                                ]},                                                                              
-                                                                              ]))
-    loadProjects()
-  }
-
-  function setDraggingList(id)
-  {
-    draggingListID.current = id
-  }
-
-  function moveList(toID)
-  {
-    let newCards = [...cards]
-    let newIndex = newCards.findIndex(list => list.id === toID)
-    let oldIndex = newCards.findIndex(list => list.id === draggingListID.current)
-
-    newCards[oldIndex].transitionedFrom = oldIndex > newIndex ? 'right': 'left'
-    newCards[newIndex].transitionedFrom = oldIndex > newIndex ? 'left' : 'right'
-    
-    let list = newCards.splice(oldIndex, 1)[0]
-    newCards.splice(newIndex, 0, list)
-
-    setCards(newCards)
-  }
-  
-  function dropOnCard_Cards({inPos, inListPos, outPos, outListPos})
-  {
-    transferCard({inPos, inListPos, outPos, outListPos, cards, setCards})
-  }
-
-  function dropOnCard_Bookmarks({inPos, inListPos, outPos, outListPos})
-  {
-    transferCard({inPos, inListPos, outPos, outListPos, cards: bookmarks, setCards: setBookmarks})
-  }
-
-  function dropOnList({inPos, inListPos, outPos, outListPos})
-  {
-    let newCards = [...cards]
-    let card = newCards[outListPos].tasks.splice(outPos, 1)[0]
-    newCards[inListPos].tasks.splice(inPos, 0, card)  
-
-    setCards(newCards)
-  }
-  
-  function transferCard({inPos, inListPos, outPos, outListPos, cards, setCards})
-  {
-    let newCards = [...cards]
-    let card = newCards[outListPos].tasks.splice(outPos, 1)[0]
-    newCards[inListPos].tasks.splice(inPos, 0, card)  
-
-    setCards(newCards)
-  }
-
-  function insertList(listID)
-  {
-    let newCards = [...cards]
-    let index = newCards.findIndex(e => e.id === listID)
-    newCards.splice(index, 0, new List())
-    setCards(newCards)
-  }
-
-  function addList(listPos)
-  {
-    let newCards = [...cards]
-    newCards.splice(listPos + 1, 0, new List())
-    setCards(newCards)
-  }
-
-  function removeList(listPos)
-  {
-    if (cards.length > 1)
-    {
-      let newCards = [...cards]
-      newCards.splice(listPos, 1)
-      setCards(newCards)
-    }
-  }
-
-  function addCard(listPos)
-  {
-    let newCard = new Card()
-    let newCards = [...cards]
-
-    newCards[listPos].tasks.splice(0,0, newCard)
-
-    setCards(newCards)
-  }
-
-  function updateCard({pos, listPos, card})
-  {
-    let newCards = [...cards]
-    let updatedCard = {...newCards[listPos].tasks[pos], ...card}
-    newCards[listPos].tasks[pos] = updatedCard
-    updateCardInBookmarks(updatedCard)
-    setCards(newCards)
-    setFeed([`${userID} updated task: ${updatedCard.title}` ,...feed])
-  }
-
-  //temporary for localstorage behavior
-  function updateCardInBookmarks(card)
+  function toggleBookmark(card)
   {
     let newBookmarks = [...bookmarks]
-    let bookmarkIndex = newBookmarks[0].tasks.findIndex(e => e.id === card.id)
-    newBookmarks[0].tasks[bookmarkIndex] = card
-    saveBookmarks(userID)
-  }
+    let toRemoveIndex;
 
-  function setBookmark(id, value)
-  {
-    let cardIndex, card
-    cards.some(e => {
-      if ((cardIndex = e.tasks.findIndex(card => card.id === id)) !== -1)
-      {
-        card = e.tasks[cardIndex]
-        return true
-      }
-      return false
-    })
-    
-    if (value === true)
+    if ((toRemoveIndex = bookmarks.findIndex(e => e.taskId === card.id)) !== -1)
     {
-      let newBookmarks = [...bookmarks]
-      newBookmarks[0].tasks.push(card)      
-      setBookmarks(newBookmarks)
+      newBookmarks.splice(toRemoveIndex, 1)
+
+      fetch(`bookmarks/${bookmarks[toRemoveIndex].id}`, {
+        method: "DELETE"
+      })
     }
-    else 
+    else
     {
-      let newBookmarks = [...bookmarks]
-      let bookmarkIndex = newBookmarks[0].tasks.findIndex(e => e.id === id)
-      newBookmarks[0].tasks.splice(bookmarkIndex,1)
-      setBookmarks(newBookmarks)
+      let newBookmark = {id: uuidv4(), userId: userID, taskId: card.id, task: {...card}}
+      newBookmarks.push(newBookmark)
+
+      let header = new Headers()
+      header.append("Content-Type", "application/json")
+      let body = JSON.stringify({ id: newBookmark.id, userId: newBookmark.userId, taskId: newBookmark.taskId})
+
+      fetch(`bookmarks/${newBookmark.id}`, { //json-server doesn't respect the http standard in regards to put creating a new resource, fallback POST req if put fails
+        method: 'PUT',
+        headers: header,
+        body
+      })
+      .then(res => {
+          if (res.status === 404)
+          fetch('bookmarks', {        
+              method: "POST",
+              body,
+              headers: header
+      })
+      })
     }
+
+    setBookmarks(newBookmarks)
   }
 
-  function Card()
+  function isBookmarked(cardId)
   {
-    this.id = uuidv4()
-    this.title = 'New Card'
-    this.content = 'Click the container to edit'
-    this.tasks = []
-    this.preferredDisplay = 'Description'
-    this.isNew = true
-  }
+    return bookmarks.some(e => e.task.id === cardId)
+  }  
 
-  function List()
-  {
-    this.id = uuidv4()
-    this.title = 'Drag me'
-    this.tasks = []
-  }
+  //todo - some login form, assigns, priority, sorting, create new project, add user to project
 
   return (
-    <div id='app' style={{'--dragging-card-height': `${draggingCardHeight}px`}}>
-      <Sidebar currentProject={currentProject} availableProjects={availableProjects}></Sidebar>
+    <div id='app'>
       {
         availableProjects !== null ?
-        <>
-          <div className='CardArea'>
-          <FocusArea bookmarks={bookmarks} dropOnCard={dropOnCard_Bookmarks} setBookmark={setBookmark}></FocusArea>
-          <Navbar></Navbar>
-          <div className='CardList_Area'>
-              {
-                cards.map((e,i) => {
-                  return <CardList key={e.id} id={e.id} pos={i} title={e.title} cards={e.tasks} type='task' dropOnCard={dropOnCard_Cards} addCard={addCard} dropOnList={dropOnList}
-                  setDraggingList={setDraggingList} moveList={moveList} insertList={insertList} addList={addList} draggable={true} displayMenu={true}
-                  setBookmark={setBookmark} updateCard={updateCard} removeList={removeList} setDraggingCardHeight={(height) => setDraggingCardHeight(height)}
-                  transitionedFrom={Object.hasOwn(e, 'transitionedFrom') && e.transitionedFrom}></CardList>
-                })
-              }
-          </div>
-          </div>
-          <Feed data={feed}></Feed>
-        </>
+        <Sidebar currentProject={currentProject !== null ? currentProject : undefined} availableProjects={availableProjects.projects} setProject={setProject}></Sidebar>
         :
+        <span>No projects are available</span>
+      }
+      <div className='CardArea'>
+      <FocusArea isLoading={bookmarksPending} hasError={bookmarksError} bookmarks={bookmarks} toggleBookmark={toggleBookmark}></FocusArea>
+      <Navbar setFilter={setFilter}></Navbar>
+      {
+        currentProject === null ?
+        <div>No project is selected sadge</div>
+        :
+        <CardListArea draggable={true} displayMenu={true} projectId={currentProject.id} isBookmarked={isBookmarked} toggleBookmark={toggleBookmark} filter={filter}></CardListArea>
+      }
+      </div>
+      <Feed data={[]}></Feed>
+      {
+        availableProjects === null && !projectsPending && 
         <div className='no_content'>No project is available
-          <button onClick={createProject}>Create new</button>
+          <button>Create new</button>
         </div>
       }
     </div>
